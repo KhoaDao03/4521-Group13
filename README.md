@@ -5,7 +5,7 @@ Project Title: Healthcare Information Management System.
 
 Description: 
 A Web application that involves a database managing patients' healthcare information.
-There will be two roles in the web applications doctor and the patient.
+There will be three roles in the web applications doctor, the patient, and a database manager.
 Each user will have a profile that can be accessed by doctors and the patients themselves. The information can be secured through Secure Computing with Distributed/ Parallel Computing for other operations of the website. 
 
 How to split the workload: 
