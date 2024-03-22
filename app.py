@@ -12,47 +12,47 @@ def register():
 
 @app.route('/doctorhome')
 def doctorhome():
-    return render_template('doctorhome.html')
+    return render_template('doctorHome.html')
 
 @app.route('/doctorprofile')
 def doctorprofile():
-    return render_template('doctorprofile.html')
+    return render_template('doctorProfile.html')
 
 @app.route('/patientspage')
 def patientspage():
-    return render_template('patientspage.html')
+    return render_template('patientsPage.html')
 
 @app.route('/doctorprescriptions')
 def doctorprescriptions():
-    return render_template('doctorprescriptions.html')
+    return render_template('doctorPrescriptions.html')
 
 @app.route('/doctormedicaldocs')
 def doctormedicaldocs():
-    return render_template('doctormedicaldocs.html')
+    return render_template('doctorMedicalDocs.html')
 
 @app.route('/doctorappointments')
 def doctorappointments():
-    return render_template('doctorappointments.html')
+    return render_template('doctorAppointments.html')
 
 @app.route('/patienthome')
 def patienthome():
-    return render_template('patienthome.html')
+    return render_template('patientHome.html')
 
 @app.route('/patientprofile')
 def patientprofile():
-    return render_template('patientprofile.html')
+    return render_template('patientProfile.html')
 
 @app.route('/patientmedicaldocs')
 def patientmedicaldocs():
-    return render_template('patientmedicaldocs.html')
+    return render_template('patientMedicalFocs.html')
 
 @app.route('/patientprescriptions')
 def patientprescriptions():
-    return render_template('patientprescriptions.html')
+    return render_template('patientPrescriptions.html')
 
 @app.route('/patientappointments')
 def patientappointments():
-    return render_template('patientappointments.html')
+    return render_template('patientAppointments.html')
 
 @app.route('/billing')
 def billing():
@@ -60,7 +60,7 @@ def billing():
 
 @app.route('/doctorsearch')
 def doctorsearch():
-    return render_template('doctorsearch.html')
+    return render_template('doctorSearch.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
