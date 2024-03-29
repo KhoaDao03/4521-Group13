@@ -51,7 +51,7 @@ def create_tables():
     cursor.execute('''CREATE TABLE IF NOT EXISTS MedicalHistories (
                       MedicalHistoryID INT AUTO_INCREMENT PRIMARY KEY,
                       PatientID INT,
-                      Condition TEXT,
+                      `Condition` TEXT,
                       DiagnosisDate DATE,
                       Treatment TEXT,
                       FOREIGN KEY (PatientID) REFERENCES PatientProfiles(PatientID)
