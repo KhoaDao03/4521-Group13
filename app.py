@@ -73,6 +73,16 @@ def delete_doctor(id):
     conn.close()
     return redirect(url_for('doctor_home'))
 
+@app.route('/listdoctors')
+def list_doctors():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM DoctorProfiles')
+    doctors = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('listDoctors.html', doctors=doctors)
+
 @app.route('/doctorprofile')
 def doctorprofile():
     return render_template('doctorProfile.html')
