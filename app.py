@@ -131,5 +131,21 @@ def billing():
 def doctorsearch():
     return render_template('doctorSearch.html')
 
+
+@app.route('/addPatient', methods=['POST'])
+def add_patient():
+    if request.method == 'POST':
+        fullname = request.form['FullName']
+        dob = request.form['DOB']
+        gender = request.form['Gender']
+        address = request.form['Address']
+        medicalhistoryid = request.form['MedicalHistoryID']
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO PatientProfiles (FullName, DOB, Gender, Address, MedicalHistoryID) VALUES (%s, %s, %s, %s, %s)", (fullname, dob, gender, address, medicalhistoryid))
+        mysql.connection.commit()
+        flash('Patient Profile Added Successfully')
+        return redirect(url_for('Index'))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
