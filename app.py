@@ -1,6 +1,7 @@
 from flask import Flask, render_template, flash, request, redirect, url_for
 import os
 from werkzeug.utils import secure_filename
+import mysql.connector
 
 UPLOAD_FOLDER = "uploads/"
 ALLOWED_EXTENSIONS = [".pdf"]
@@ -19,8 +20,68 @@ def register():
     return render_template('register.html')
 
 @app.route('/doctorhome')
-def doctorhome():
-    return render_template('doctorHome.html')
+def doctor_home():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM DoctorProfiles')
+    doctors = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('doctorHome.html', doctors=doctors)
+
+@app.route('/adddoctor', methods=('GET', 'POST'))
+def add_doctor():
+    if request.method == 'POST':
+        fullname = request.form['fullname']
+        specialty = request.form['specialty']
+        contact_info = request.form['contactinfo']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO DoctorProfiles (FullName, Specialty, ContactInfo) VALUES (%s, %s, %s)',
+                       (fullname, specialty, contact_info))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('doctor_home'))
+    return render_template('addDoctor.html')
+
+@app.route('/editdoctor/<int:id>', methods=('GET', 'POST'))
+def edit_doctor(id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    if request.method == 'POST':
+        fullname = request.form['fullname']
+        specialty = request.form['specialty']
+        contact_info = request.form['contactinfo']
+        cursor.execute('UPDATE DoctorProfiles SET FullName = %s, Specialty = %s, ContactInfo = %s WHERE DoctorID = %s',
+                       (fullname, specialty, contact_info, id))
+        conn.commit()
+        return redirect(url_for('doctor_home'))
+
+    cursor.execute('SELECT * FROM DoctorProfiles WHERE DoctorID = %s', (id,))
+    doctor = cursor.fetchone()
+    return render_template('editDoctor.html', doctor=doctor)
+
+@app.route('/deletedoctor/<int:id>', methods=('POST',))
+def delete_doctor(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM DoctorProfiles WHERE DoctorID = %s', (id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('doctor_home'))
+
+@app.route('/listdoctors')
+def list_doctors():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM DoctorProfiles')
+    doctors = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('listDoctors.html', doctors=doctors)
 
 @app.route('/doctorprofile')
 def doctorprofile():
