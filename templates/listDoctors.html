@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Doctors</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>List of Doctors</h1>
+    <table>
+        <tr>
+            <th>Full Name</th>
+            <th>Specialty</th>
+            <th>Contact Info</th>
+            <th>Actions</th>
+        </tr>
+        {% for doctor in doctors %}
+        <tr>
+            <td>{{ doctor.FullName }}</td>
+            <td>{{ doctor.Specialty }}</td>
+            <td>{{ doctor.ContactInfo }}</td>
+            <td>
+                <a href="/editdoctor/{{ doctor.DoctorID }}">Edit</a>
+                <form action="/deletedoctor/{{ doctor.DoctorID }}" method="post" style="display: inline;">
+                    <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this doctor?');">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="/doctorhome">Back to Doctor Home</a></p>
+</body>
+</html>
