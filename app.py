@@ -51,11 +51,13 @@ def patientmedicaldocs():
 
 @app.route('/patientprescriptions')
 def patientprescriptions():
-    return render_template('patientPrescriptions.html')
+    prescriptions = read_prescriptions()
+    return render_template('patientPrescriptions.html', prescriptions=prescriptions)
 
 @app.route('/patientappointments')
 def patientappointments():
-    return render_template('patientAppointments.html')
+    appointments = read_appointments()
+    return render_template('patientAppointments.html', appointments=appointments)
 
 @app.route('/billing')
 def billing():
