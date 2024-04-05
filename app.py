@@ -1,6 +1,14 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, flash, request, redirect, url_for
+import os
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = "uploads/"
+ALLOWED_EXTENSIONS = [".pdf"]
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
+app.secret_key = '_5#y2L"F4Q8z\n\xec]'
 
 @app.route('/')
 def login():
@@ -44,7 +52,7 @@ def patientprofile():
 
 @app.route('/patientmedicaldocs')
 def patientmedicaldocs():
-    return render_template('patientMedicalFocs.html')
+    return render_template('patientMedicalDocs.html')
 
 @app.route('/patientprescriptions')
 def patientprescriptions():
@@ -61,6 +69,37 @@ def billing():
 @app.route('/doctorsearch')
 def doctorsearch():
     return render_template('doctorSearch.html')
+
+@app.route('/uploadfile', methods = ['POST'])
+def uploadfile():
+    file = request.files['file']
+    
+    if file and allowed_file(file.filename):
+        file.save(os.path.join(UPLOAD_FOLDER,secure_filename(file.filename)))
+        return redirect('/')
+    else:
+        return redirect('/patientmedicaldocs')
+        
+    
+# @app.route('/fileupload', methods = ['GET', 'POST'])
+# def uploadfile():   
+#     if request.method == 'POST':
+#         if 'file' not in request.files:
+#             flash('No file part')
+#             return redirect(request.url)
+#     file = request.files['file']
+#     if file.filename == '':
+#         flash("No file selected")
+#         return redirect(request.url)
+#     if file and allowed_file(file.filename):
+#         filename = secure_filename(file.filename)
+#         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#         return redirect(url_for('download_file'), name = filename)
+#     return render_template('patientmedicaldocs.html')
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
 if __name__ == '__main__':
     app.run(debug=True)
