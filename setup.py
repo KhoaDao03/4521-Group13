@@ -58,6 +58,16 @@ def create_tables():
                       )''')
     print('MedicalHistories table created')
 
+    #Medical Documents Table
+    cursor.execute('''CREATE TABLE IF NOT EXISTS MedicalDocuments (
+                      MedDocID INT AUTO_INCREMENT PRIMARY KEY,
+                      PatientID INT,
+                      DocType VARCHAR(64),
+                      UploadDate DATE,
+                      FOREIGN KEY (PatientID) REFERENCES PatientProfiles(PatientID)
+                      )''')
+    print('MedicalDocuments table created.')
+
     # Appointments Table
     cursor.execute('''CREATE TABLE IF NOT EXISTS Appointments (
                       AppointmentID INT AUTO_INCREMENT PRIMARY KEY,

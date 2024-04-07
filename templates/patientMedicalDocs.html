@@ -2,6 +2,15 @@
 <html lang="en">
 <body>
     <h1>Patient Medical Docs</h1>
+    <h2>My Documents</h2>
+    <table>
+        <tr>
+            <th>Document Name</th>
+            <th>Document Type</th>
+            <th>Upload Date</th>
+        </tr>
+    </table>
+    <br><br><br>
     <form action ="/uploadfile" method="post" enctype="multipart/form-data">
         <input type="file" name="file">
         <input type="submit" value="Upload">

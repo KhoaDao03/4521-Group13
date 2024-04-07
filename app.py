@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import mysql.connector
 
 UPLOAD_FOLDER = "uploads/"
-ALLOWED_EXTENSIONS = [".pdf"]
+ALLOWED_EXTENSIONS = ["pdf"]
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
