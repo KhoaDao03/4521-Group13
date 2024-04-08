@@ -2,6 +2,7 @@ from flask import Flask, render_template, flash, request, redirect, url_for
 import os
 from werkzeug.utils import secure_filename
 import mysql.connector
+import datetime
 
 UPLOAD_FOLDER = "uploads/"
 ALLOWED_EXTENSIONS = ["pdf"]
@@ -11,6 +12,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
 app.secret_key = '_5#y2L"F4Q8z\n\xec]'
 
+def get_db_connection():
+    return mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='root',
+        database='MedicalData'
+    )
+
+
 @app.route('/')
 def login():
     return render_template('login.html')
@@ -18,6 +28,20 @@ def login():
 @app.route('/register')
 def register():
     return render_template('register.html')
+
+# @app.route('/login', methods = ['GET','POST'])
+# def login():
+#     msg = ""
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         password = request.form['password']
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute('SELECT * FROM users WHERE Username = %s AND Password =%s', (username, password))
+#         record = cursor.fetchone()
+#         if record:
+#             return
+#         return
 
 @app.route('/doctorhome')
 def doctor_home():
@@ -136,11 +160,30 @@ def uploadfile():
     file = request.files['file']
     
     if file and allowed_file(file.filename):
+        ##Get Patient Id Here
+        doctype = "Medical Document"
+        current_day = datetime.date
+        uploaddate = (current_day.today())
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('INSERT INTO MedicalDocuments (DocType, UploadDate) VALUES (%s,%s)',
+                       (doctype, uploaddate))
+        conn.commit()
+        cursor.close()
+        conn.close()
         file.save(os.path.join(UPLOAD_FOLDER,secure_filename(file.filename)))
         return redirect('/')
     else:
         return redirect('/patientmedicaldocs')
-        
+@app.route('/list_docs', methods = ['POST'])  
+def list_docs():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM MedicalDocuments')
+    docs = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('doctorMedicalDocs.html', meddocs = docs)
     
 # @app.route('/fileupload', methods = ['GET', 'POST'])
 # def uploadfile():   
