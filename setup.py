@@ -62,6 +62,7 @@ def create_tables():
     cursor.execute('''CREATE TABLE IF NOT EXISTS MedicalDocuments (
                       MedDocID INT AUTO_INCREMENT PRIMARY KEY,
                       PatientID INT,
+                      DocName VARCHAR(64),
                       DocType VARCHAR(64),
                       UploadDate DATE,
                       FOREIGN KEY (PatientID) REFERENCES PatientProfiles(PatientID)

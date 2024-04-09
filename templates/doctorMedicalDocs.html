@@ -16,12 +16,14 @@
     <table>
         {% if meddocs %}
             <tr>
+                <th>Document Name</th>
                 <th>Document Type</th>
                 <th>Upload Date</th>
                 <th>Actions</th>
             </tr>
             {%for doc in meddocs %}
             <tr>
+                <td>{{doc.DocName}}</td>
                 <td>{{doc.DocType}}</td>
                 <td>{{doc.UploadDate}}</td>
                 <td>

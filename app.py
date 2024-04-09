@@ -161,20 +161,22 @@ def uploadfile():
     
     if file and allowed_file(file.filename):
         ##Get Patient Id Here
+        docname = secure_filename(file.filename)
         doctype = "Medical Document"
         current_day = datetime.date
         uploaddate = (current_day.today())
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute('INSERT INTO MedicalDocuments (DocType, UploadDate) VALUES (%s,%s)',
-                       (doctype, uploaddate))
+        cursor.execute('INSERT INTO MedicalDocuments (DocName, DocType, UploadDate) VALUES (%s,%s,%s)',
+                       (docname, doctype, uploaddate))
         conn.commit()
         cursor.close()
         conn.close()
-        file.save(os.path.join(UPLOAD_FOLDER,secure_filename(file.filename)))
+        file.save(os.path.join(UPLOAD_FOLDER,docname))
         return redirect('/')
     else:
         return redirect('/patientmedicaldocs')
+
 @app.route('/list_docs', methods = ['POST'])  
 def list_docs():
     conn = get_db_connection()
