@@ -7,12 +7,26 @@
     <h1>Patient Medical Docs</h1>
     <h2>My Documents</h2>
     <table>
-        <tr>
-            <th>Document Name</th>
-            <th>Document Type</th>
-            <th>Upload Date</th>
-        </tr>
-    </table>
+        {% if meddocs %}
+            <tr>
+                <th>Document Name</th>
+                <th>Document Type</th>
+                <th>Upload Date</th>
+                <th>Actions</th>
+            </tr>
+            {%for doc in meddocs %}
+            <tr>
+                <td>{{doc.DocName}}</td>
+                <td>{{doc.DocType}}</td>
+                <td>{{doc.UploadDate}}</td>
+                <td>
+                    <a href="">View</a>
+                    <form action ="" method = "post" style="display: inline"></form>
+                        <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this doctor?');">
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
     <br><br><br>
     <form action ="/uploadfile" method="post" enctype="multipart/form-data">
         <input type="file" name="file">

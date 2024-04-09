@@ -65,7 +65,7 @@ def create_tables():
                       DocName VARCHAR(64),
                       DocType VARCHAR(64),
                       UploadDate DATE,
-                      FOREIGN KEY (PatientID) REFERENCES PatientProfiles(PatientID)
+                      FOREIGN KEY (PatientID) REFERENCES Users(UserID)
                       )''')
     print('MedicalDocuments table created.')
 

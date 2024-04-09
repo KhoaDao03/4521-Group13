@@ -6,6 +6,7 @@ import datetime
 
 UPLOAD_FOLDER = "uploads/"
 ALLOWED_EXTENSIONS = ["pdf"]
+CURRENT_USERID = 1  ####This is to be removed when we get proper login and can hold the users ID that way
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -137,7 +138,13 @@ def patientprofile():
 
 @app.route('/patientmedicaldocs')
 def patientmedicaldocs():
-    return render_template('patientMedicalDocs.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM MedicalDocuments WHERE PatientID = %s', (CURRENT_USERID,))
+    udocs = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('patientMedicalDocs.html', meddocs = udocs)
 
 @app.route('/patientprescriptions')
 def patientprescriptions():
@@ -161,14 +168,15 @@ def uploadfile():
     
     if file and allowed_file(file.filename):
         ##Get Patient Id Here
+        userid = CURRENT_USERID
         docname = secure_filename(file.filename)
         doctype = "Medical Document"
         current_day = datetime.date
         uploaddate = (current_day.today())
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute('INSERT INTO MedicalDocuments (DocName, DocType, UploadDate) VALUES (%s,%s,%s)',
-                       (docname, doctype, uploaddate))
+        cursor.execute('INSERT INTO MedicalDocuments (PatientID, DocName, DocType, UploadDate) VALUES (%s,%s,%s,%s)',
+                       (userid, docname, doctype, uploaddate))
         conn.commit()
         cursor.close()
         conn.close()
