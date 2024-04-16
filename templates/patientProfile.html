@@ -1,34 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Patient Profiles</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Patient Profiles</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
 </head>
 <body>
-    <h2>Patient Profiles</h2>
-    
-    <!-- Display patient profiles -->
-    <table border="1">
-        <tr>
-            <th>Full Name</th>
-            <th>Date of Birth</th>
-            <th>Gender</th>
-            <th>Address</th>
-            <th>Actions</th>
-        </tr>
-        {% for profile in patient_profiles %}
-        <tr>
-            <td>{{ profile.FullName }}</td>
-            <td>{{ profile.DOB }}</td>
-            <td>{{ profile.Gender }}</td>
-            <td>{{ profile.Address }}</td>
-            <td>
-                <!-- Add a delete button for each patient profile -->
-                <a href="/delete/{{ profile.PatientID }}">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+        <h2>Patient Profiles</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in patient_profiles %}
+                <tr>
+                    <td>{{ profile['FullName'] }}</td>
+                    <td>{{ profile['DOB'] }}</td>
+                    <td>{{ profile['Gender'] }}</td>
+                    <td>{{ profile['Address'] }}</td>
+                    <td>
+                        <form action="/delete/{{ profile['PatientID'] }}" method="post">
+                            <button type="submit" style="color: red;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     
     <h3>Add New Patient</h3>
     <!-- Form for adding a new patient -->

@@ -109,7 +109,13 @@ def patienthome():
 
 @app.route('/patientprofile')
 def patientprofile():
-    return render_template('patientProfile.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM PatientProfiles")
+    profiles = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('patientProfile.html', patient_profiles=profiles)
 
 @app.route('/patientmedicaldocs')
 def patientmedicaldocs():
@@ -140,11 +146,23 @@ def add_patient():
         gender = request.form['Gender']
         address = request.form['Address']
         medicalhistoryid = request.form['MedicalHistoryID']
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO PatientProfiles (FullName, DOB, Gender, Address, MedicalHistoryID) VALUES (%s, %s, %s, %s, %s)", (fullname, dob, gender, address, medicalhistoryid))
-        mysql.connection.commit()
-        flash('Patient Profile Added Successfully')
-        return redirect(url_for('Index'))
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)   
+        cursor.execute("INSERT INTO PatientProfiles (FullName, DOB, Gender, Address, MedicalHistoryID) VALUES (%s, %s, %s, %s, %s)", (fullname, dob, gender, address, medicalhistoryid))
+        conn.commit()
+        #Flask('Patient Profile Added Successfully')
+        return render_template('patientProfile.html')
+
+
+@app.route('/delete/<int:patient_id>', methods=['POST'])
+def delete_patient(patient_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM PatientProfiles WHERE PatientID = %s", (patient_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return patientprofile()
 
 
 if __name__ == '__main__':
