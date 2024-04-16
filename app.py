@@ -133,9 +133,23 @@ def patientappointments():
 def billing():
     return render_template('billing.html')
 
-@app.route('/doctorsearch')
+@app.route('/doctorsearch', methods=['GET', 'POST'])
 def doctorsearch():
-    return render_template('doctorSearch.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    search_query = request.form.get('search_query', '')
+
+    if request.method == 'POST' and search_query:
+        cursor.execute("SELECT * FROM DoctorProfiles WHERE FullName LIKE %s", (f"%{search_query}%",))
+    else:
+        cursor.execute("SELECT * FROM DoctorProfiles")
+
+    doctors = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('doctorSearch.html', doctors=doctors, search_query=search_query)
+
+
 
 
 @app.route('/addPatient', methods=['POST'])
