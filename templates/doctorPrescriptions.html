@@ -1,3 +1,45 @@
-<h1>Doctor's Prescriptions</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Doctor Prescriptions</title>
+</head>
+<body>
+    <h1>Add Doctor Prescription</h1>
+    <form action="/add_doctor_prescription" method="post">
+        <label for="appointment_id">Appointment ID:</label>
+        <input type="number" id="appointment_id" name="appointment_id" required><br><br>
+        <label for="medication">Medication:</label>
+        <input type="text" id="medication" name="medication" required><br><br>
+        <label for="dosage">Dosage:</label>
+        <input type="text" id="dosage" name="dosage" required><br><br>
+        <label for="duration">Duration:</label>
+        <input type="text" id="duration" name="duration" required><br><br>
+        <label for="notes">Notes:</label>
+        <textarea id="notes" name="notes"></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    
+    <h1>Doctor Prescriptions</h1>
+    <table border="1">
+        <tr>
+            <th>Prescription ID</th>
+            <th>Appointment ID</th>
+            <th>Medication</th>
+            <th>Dosage</th>
+            <th>Duration</th>
+            <th>Notes</th>
+        </tr>
+        {% for prescription in prescriptions %}
+        <tr>
+            <td>{{ prescription.PrescriptionID }}</td>
+            <td>{{ prescription.AppointmentID }}</td>
+            <td>{{ prescription.Medication }}</td>
+            <td>{{ prescription.Dosage }}</td>
+            <td>{{ prescription.Duration }}</td>
+            <td>{{ prescription.Notes }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
 
-<p><a href="/patientspage">Back to Patient's Page</a></p>

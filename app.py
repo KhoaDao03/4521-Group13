@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 import mysql.connector
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, request
+from PresAndAppo import read_appointments, read_prescriptions, create_appointment, create_prescription
 
 app = Flask(__name__)
 app.secret_key = 'secret_key' # Needed for session management and flash messages
@@ -136,7 +137,8 @@ def patientspage():
 
 @app.route('/doctorprescriptions')
 def doctorprescriptions():
-    return render_template('doctorPrescriptions.html')
+    prescriptions = read_prescriptions()
+    return render_template('doctorPrescriptions.html', prescriptions=prescriptions)
 
 @app.route('/doctormedicaldocs')
 def doctormedicaldocs():
@@ -144,7 +146,8 @@ def doctormedicaldocs():
 
 @app.route('/doctorappointments')
 def doctorappointments():
-    return render_template('doctorAppointments.html')
+    appointments = read_appointments()
+    return render_template('doctorAppointments.html', appointments=appointments)
 
 @app.route('/patienthome')
 def patienthome():
@@ -160,11 +163,13 @@ def patientmedicaldocs():
 
 @app.route('/patientprescriptions')
 def patientprescriptions():
-    return render_template('patientPrescriptions.html')
+    prescriptions = read_prescriptions()
+    return render_template('patientPrescriptions.html', prescriptions=prescriptions)
 
 @app.route('/patientappointments')
 def patientappointments():
-    return render_template('patientAppointments.html')
+    appointments = read_appointments()
+    return render_template('patientAppointments.html', appointments=appointments)
 
 @app.route('/billing')
 def billing():
@@ -173,6 +178,32 @@ def billing():
 @app.route('/doctorsearch')
 def doctorsearch():
     return render_template('doctorSearch.html')
+
+@app.route('/add_doctor_appointment', methods=['POST'])
+def add_doctor_appointment():
+    if request.method == 'POST':
+        patient_id = request.form['patient_id']
+        doctor_id = request.form['doctor_id']
+        appointment_date = request.form['appointment_date']
+        purpose = request.form['purpose']
+        notes = request.form['notes']
+
+        create_appointment(patient_id, doctor_id, appointment_date, purpose, notes)
+        
+        return redirect(url_for('doctorappointments'))
+    
+@app.route('/add_doctor_prescription', methods=['POST'])
+def add_doctor_prescriptions():
+    if request.method == 'POST':
+        appointment_id = request.form['appointment_id']
+        medication = request.form['medication']
+        dosage = request.form['dosage']
+        duration = request.form['duration']
+        notes = request.form['notes']
+
+        create_prescription(appointment_id, medication, dosage, duration, notes)
+
+        return redirect(url_for('doctorprescriptions'))
 
 if __name__ == '__main__':
     app.run(debug=True)
