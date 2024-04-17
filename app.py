@@ -1,7 +1,9 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, flash
 import mysql.connector
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
+app.secret_key = 'secret_key' # Needed for session management and flash messages
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -15,8 +17,35 @@ def get_db_connection():
 def login():
     return render_template('login.html')
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+        contact_info = ""  # Assuming you might want to add this later
+
+        # Check if user already exists
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Users WHERE Username = %s", (username,))
+        if cursor.fetchone():
+            flash('Username already exists. Please choose another one.', 'error')
+            return redirect(url_for('register'))
+        
+        # Hash the password for security
+        hashed_password = generate_password_hash(password)
+        
+        # Insert the new user into the Users table
+        cursor.execute("INSERT INTO Users (Username, Password, Role, ContactInfo) VALUES (%s, %s, %s, %s)",
+                       (username, hashed_password, role, contact_info))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        flash('Registration successful. Please login.', 'success')
+        return redirect(url_for('login'))
+    
     return render_template('register.html')
 
 @app.route('/doctorhome')
@@ -32,17 +61,31 @@ def doctor_home():
 @app.route('/adddoctor', methods=('GET', 'POST'))
 def add_doctor():
     if request.method == 'POST':
+        username = request.form['username']
         fullname = request.form['fullname']
         specialty = request.form['specialty']
         contact_info = request.form['contactinfo']
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO DoctorProfiles (FullName, Specialty, ContactInfo) VALUES (%s, %s, %s)',
-                       (fullname, specialty, contact_info))
+
+        # Check if user exists and is a doctor
+        cursor.execute("SELECT UserID FROM Users WHERE Username = %s AND Role = 'doctor'", (username,))
+        user = cursor.fetchone()
+
+        if user is None:
+            cursor.close()
+            conn.close()
+            return redirect(url_for('register'))
+
+        # Insert new doctor profile using the UserID from Users table
+        user_id = user[0]
+        cursor.execute('INSERT INTO DoctorProfiles (DoctorID, FullName, Specialty, ContactInfo) VALUES (%s, %s, %s, %s)',
+                       (user_id, fullname, specialty, contact_info))
         conn.commit()
         cursor.close()
         conn.close()
         return redirect(url_for('doctor_home'))
+    
     return render_template('addDoctor.html')
 
 @app.route('/editdoctor/<int:id>', methods=('GET', 'POST'))
