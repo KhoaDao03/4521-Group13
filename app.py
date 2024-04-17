@@ -1,7 +1,7 @@
-from flask import Flask, render_template, flash, request, redirect, url_for
+from flask import Flask, render_template, flash, request, redirect, url_for, session
 import os
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from PresAndAppo import read_appointments, read_prescriptions, create_appointment, create_prescription
 
 import mysql.connector
@@ -26,7 +26,7 @@ def get_db_connection():
 
 
 @app.route('/')
-def login():
+def display_login():
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -56,23 +56,37 @@ def register():
         conn.close()
 
         flash('Registration successful. Please login.', 'success')
-        return redirect(url_for('login'))
+        return redirect(url_for('display_login'))
     
     return render_template('register.html')
 
-# @app.route('/login', methods = ['GET','POST'])
-# def login():
-#     msg = ""
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         conn = get_db_connection()
-#         cursor = conn.cursor(dictionary=True)
-#         cursor.execute('SELECT * FROM users WHERE Username = %s AND Password =%s', (username, password))
-#         record = cursor.fetchone()
-#         if record:
-#             return
-#         return
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM Users WHERE Username = %s", (username,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if user and check_password_hash(user['Password'], password):
+            session['user_id'] = user['UserID']  # Store user ID in session
+            if user['Role'] == 'doctor':
+                return redirect(url_for('doctor_home'))
+            elif user['Role'] == 'patient':
+                return redirect(url_for('patienthome'))
+            else:
+                flash('Login successful. No designated dashboard.', 'success')
+                return redirect(url_for('login'))  # Redirect to a default page or error page
+        else:
+            flash('Invalid username or password.', 'error')
+            return redirect(url_for('display_login'))
+
+    return render_template('login.html')
 
 @app.route('/doctorhome')
 def doctor_home():
