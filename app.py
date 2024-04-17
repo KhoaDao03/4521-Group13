@@ -1,7 +1,7 @@
 from flask import Flask, render_template, flash, request, redirect, url_for
 import os
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash, request
+from werkzeug.security import generate_password_hash
 from PresAndAppo import read_appointments, read_prescriptions, create_appointment, create_prescription
 
 import mysql.connector
