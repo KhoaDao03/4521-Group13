@@ -152,9 +152,9 @@ def list_doctors():
     conn.close()
     return render_template('listDoctors.html', doctors=doctors)
 
-@app.route('/doctorprofile')
-def doctorprofile():
-    return render_template('doctorProfile.html')
+# @app.route('/doctorprofile')
+# def doctorprofile():
+#     return render_template('doctorProfile.html')
 
 @app.route('/patientspage')
 def patientspage():
@@ -207,10 +207,6 @@ def patientprescriptions():
 def patientappointments():
     appointments = read_appointments()
     return render_template('patientAppointments.html', appointments=appointments)
-
-@app.route('/billing')
-def billing():
-    return render_template('billing.html')
 
 @app.route('/doctorsearch', methods=['GET', 'POST'])
 def doctorsearch():
