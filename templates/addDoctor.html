@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Doctor</title>
+</head>
+<body>
+    <h1>Add New Doctor</h1>
+    <form action="/adddoctor" method="post">
+      <label for="username">Username:</label><br>
+      <input type="text" id="username" name="username" required><br>
+      
+        <label for="fullname">Full Name:</label><br>
+        <input type="text" id="fullname" name="fullname" required><br>
+
+        <label for="specialty">Specialty:</label><br>
+        <input type="text" id="specialty" name="specialty" required><br>
+
+        <label for="contactinfo">Contact Info:</label><br>
+        <textarea id="contactinfo" name="contactinfo" rows="4" required></textarea><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <p><a href="/doctorhome">Back to Doctor Home</a></p>
+</body>
+</html>
