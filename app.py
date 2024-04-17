@@ -1,10 +1,20 @@
-from flask import Flask, request, render_template, redirect, url_for, flash
-import mysql.connector
+from flask import Flask, render_template, flash, request, redirect, url_for
+import os
+from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, request
 from PresAndAppo import read_appointments, read_prescriptions, create_appointment, create_prescription
 
+import mysql.connector
+import datetime
+
+UPLOAD_FOLDER = "uploads/"
+ALLOWED_EXTENSIONS = ["pdf"]
+CURRENT_USERID = 1  ####This is to be removed when we get proper login and can hold the users ID that way
+
 app = Flask(__name__)
-app.secret_key = 'secret_key' # Needed for session management and flash messages
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
+app.secret_key = '_5#y2L"F4Q8z\n\xec]'
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -13,6 +23,7 @@ def get_db_connection():
         password='root',
         database='MedicalData'
     )
+
 
 @app.route('/')
 def login():
@@ -48,6 +59,20 @@ def register():
         return redirect(url_for('login'))
     
     return render_template('register.html')
+
+# @app.route('/login', methods = ['GET','POST'])
+# def login():
+#     msg = ""
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         password = request.form['password']
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute('SELECT * FROM users WHERE Username = %s AND Password =%s', (username, password))
+#         record = cursor.fetchone()
+#         if record:
+#             return
+#         return
 
 @app.route('/doctorhome')
 def doctor_home():
@@ -165,7 +190,13 @@ def patientprofile():
 
 @app.route('/patientmedicaldocs')
 def patientmedicaldocs():
-    return render_template('patientMedicalFocs.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM MedicalDocuments WHERE PatientID = %s', (CURRENT_USERID,))
+    udocs = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('patientMedicalDocs.html', meddocs = udocs)
 
 @app.route('/patientprescriptions')
 def patientprescriptions():
@@ -252,6 +283,59 @@ def add_doctor_prescriptions():
         create_prescription(appointment_id, medication, dosage, duration, notes)
 
         return redirect(url_for('doctorprescriptions'))
+
+@app.route('/uploadfile', methods = ['POST'])
+def uploadfile():
+    file = request.files['file']
+    
+    if file and allowed_file(file.filename):
+        ##Get Patient Id Here
+        userid = CURRENT_USERID
+        docname = secure_filename(file.filename)
+        doctype = "Medical Document"
+        current_day = datetime.date
+        uploaddate = (current_day.today())
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('INSERT INTO MedicalDocuments (PatientID, DocName, DocType, UploadDate) VALUES (%s,%s,%s,%s)',
+                       (userid, docname, doctype, uploaddate))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        file.save(os.path.join(UPLOAD_FOLDER,docname))
+        return redirect('/')
+    else:
+        return redirect('/patientmedicaldocs')
+
+@app.route('/list_docs', methods = ['POST'])  
+def list_docs():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM MedicalDocuments')
+    docs = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('doctorMedicalDocs.html', meddocs = docs)
+    
+# @app.route('/fileupload', methods = ['GET', 'POST'])
+# def uploadfile():   
+#     if request.method == 'POST':
+#         if 'file' not in request.files:
+#             flash('No file part')
+#             return redirect(request.url)
+#     file = request.files['file']
+#     if file.filename == '':
+#         flash("No file selected")
+#         return redirect(request.url)
+#     if file and allowed_file(file.filename):
+#         filename = secure_filename(file.filename)
+#         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#         return redirect(url_for('download_file'), name = filename)
+#     return render_template('patientmedicaldocs.html')
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
 if __name__ == '__main__':
     app.run(debug=True)
