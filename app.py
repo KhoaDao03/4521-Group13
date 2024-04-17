@@ -240,7 +240,8 @@ def add_patient():
         cursor.execute("INSERT INTO PatientProfiles (FullName, DOB, Gender, Address, MedicalHistoryID) VALUES (%s, %s, %s, %s, %s)", (fullname, dob, gender, address, medicalhistoryid))
         conn.commit()
         #Flask('Patient Profile Added Successfully')
-        return render_template('patientProfile.html')
+        return patientprofile()
+    
 
 
 @app.route('/delete/<int:patient_id>', methods=['POST'])
