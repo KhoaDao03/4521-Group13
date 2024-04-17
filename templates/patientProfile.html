@@ -1,4 +1,66 @@
-<h1>Patient Profile</h1>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Patient Profiles</title>
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+</head>
+<body>
+        <h2>Patient Profiles</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
+                    <th>Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in patient_profiles %}
+                <tr>
+                    <td>{{ profile['FullName'] }}</td>
+                    <td>{{ profile['DOB'] }}</td>
+                    <td>{{ profile['Gender'] }}</td>
+                    <td>{{ profile['Address'] }}</td>
+                    <td>
+                        <form action="/delete/{{ profile['PatientID'] }}" method="post">
+                            <button type="submit" style="color: red;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    <h3>Add New Patient</h3>
+    <!-- Form for adding a new patient -->
+    <form action="/addPatient" method="POST">
+        Full Name: <input type="text" name="FullName" required><br>
+        Date of Birth: <input type="date" name="DOB" required><br>
+        Gender: <input type="text" name="Gender"><br>
+        Address: <textarea name="Address"></textarea><br>
+        Medical History ID: <input type="number" name="MedicalHistoryID"><br>
+        <input type="submit" value="Add Patient">
+    </form>
+
+
+
+<!-- <h1>Patient Profile</h1> -->
 
 <p><a href="/patientmedicaldocs">Patient Medical Docs</a></p>
 <p><a href="/patientprescriptions">Patient Prescriptions</a></p>
@@ -7,3 +69,5 @@
 
 
 <br><p><a href="/patienthome">Back to Patient Home</a></p>
+</body>
+</html>

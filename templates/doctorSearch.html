@@ -1,3 +1,58 @@
-<h1>Doctor Search</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Search</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .back-button {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Search Doctor Profiles</h2>
+    <form action="/doctorsearch" method="post">
+        Search by Name: <input type="text" name="search_query" value="{{ search_query }}" placeholder="Enter doctor's name">
+        <input type="submit" value="Search">
+    </form>
 
-<p><a href="/patienthome">Back to Patient Home</a></p>
+    <button onclick="window.history.back();" class="back-button">Back</button>
+
+    <h3>Search Results:</h3>
+    {% if doctors %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Specialty</th>
+                    <th>Contact Info</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctor in doctors %}
+                <tr>
+                    <td>{{ doctor['FullName'] }}</td>
+                    <td>{{ doctor['Specialty'] }}</td>
+                    <td>{{ doctor['ContactInfo'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+</body>
+</html>
