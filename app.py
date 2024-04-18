@@ -1,10 +1,20 @@
-from flask import Flask, request, render_template, redirect, url_for, flash
-import mysql.connector
-from werkzeug.security import generate_password_hash, request
+from flask import Flask, render_template, flash, request, redirect, url_for, session
+import os
+from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 from PresAndAppo import read_appointments, read_prescriptions, create_appointment, create_prescription
 
+import mysql.connector
+import datetime
+
+UPLOAD_FOLDER = "uploads/"
+ALLOWED_EXTENSIONS = ["pdf"]
+CURRENT_USERID = 1  ####This is to be removed when we get proper login and can hold the users ID that way
+
 app = Flask(__name__)
-app.secret_key = 'secret_key' # Needed for session management and flash messages
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 #16MB
+app.secret_key = '_5#y2L"F4Q8z\n\xec]'
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -14,8 +24,9 @@ def get_db_connection():
         database='MedicalData'
     )
 
+
 @app.route('/')
-def login():
+def display_login():
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -35,7 +46,7 @@ def register():
             return redirect(url_for('register'))
         
         # Hash the password for security
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         
         # Insert the new user into the Users table
         cursor.execute("INSERT INTO Users (Username, Password, Role, ContactInfo) VALUES (%s, %s, %s, %s)",
@@ -45,9 +56,37 @@ def register():
         conn.close()
 
         flash('Registration successful. Please login.', 'success')
-        return redirect(url_for('login'))
+        return redirect(url_for('display_login'))
     
     return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM Users WHERE Username = %s", (username,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if user and check_password_hash(user['Password'], password):
+            session['user_id'] = user['UserID']  # Store user ID in session
+            if user['Role'] == 'doctor':
+                return redirect(url_for('doctor_home'))
+            elif user['Role'] == 'patient':
+                return redirect(url_for('patienthome'))
+            else:
+                flash('Login successful. No designated dashboard.', 'success')
+                return redirect(url_for('login'))  # Redirect to a default page or error page
+        else:
+            flash('Invalid username or password.', 'error')
+            return redirect(url_for('display_login'))
+
+    return render_template('login.html')
 
 @app.route('/doctorhome')
 def doctor_home():
@@ -155,11 +194,23 @@ def patienthome():
 
 @app.route('/patientprofile')
 def patientprofile():
-    return render_template('patientProfile.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM PatientProfiles")
+    profiles = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('patientProfile.html', patient_profiles=profiles)
 
 @app.route('/patientmedicaldocs')
 def patientmedicaldocs():
-    return render_template('patientMedicalFocs.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM MedicalDocuments WHERE PatientID = %s', (CURRENT_USERID,))
+    udocs = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('patientMedicalDocs.html', meddocs = udocs)
 
 @app.route('/patientprescriptions')
 def patientprescriptions():
@@ -171,13 +222,57 @@ def patientappointments():
     appointments = read_appointments()
     return render_template('patientAppointments.html', appointments=appointments)
 
+
 @app.route('/billing')
 def billing():
     return render_template('billing.html')
 
-@app.route('/doctorsearch')
+@app.route('/doctorsearch', methods=['GET', 'POST'])
 def doctorsearch():
-    return render_template('doctorSearch.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    search_query = request.form.get('search_query', '')
+
+    if request.method == 'POST' and search_query:
+        cursor.execute("SELECT * FROM DoctorProfiles WHERE FullName LIKE %s", (f"%{search_query}%",))
+    else:
+        cursor.execute("SELECT * FROM DoctorProfiles")
+
+    doctors = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('doctorSearch.html', doctors=doctors, search_query=search_query)
+
+
+
+
+@app.route('/addPatient', methods=['POST'])
+def add_patient():
+    if request.method == 'POST':
+        fullname = request.form['FullName']
+        dob = request.form['DOB']
+        gender = request.form['Gender']
+        address = request.form['Address']
+        medicalhistoryid = request.form['MedicalHistoryID']
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)   
+        cursor.execute("INSERT INTO PatientProfiles (FullName, DOB, Gender, Address, MedicalHistoryID) VALUES (%s, %s, %s, %s, %s)", (fullname, dob, gender, address, medicalhistoryid))
+        conn.commit()
+        #Flask('Patient Profile Added Successfully')
+        return patientprofile()
+    
+
+
+@app.route('/delete/<int:patient_id>', methods=['POST'])
+def delete_patient(patient_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM PatientProfiles WHERE PatientID = %s", (patient_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return patientprofile()
+
 
 @app.route('/add_doctor_appointment', methods=['POST'])
 def add_doctor_appointment():
@@ -192,6 +287,19 @@ def add_doctor_appointment():
         
         return redirect(url_for('doctorappointments'))
     
+@app.route('/add_patient_appointment', methods=['POST'])
+def add_patient_appointment():
+    if request.method == 'POST':
+        patient_id = request.form['patient_id']
+        doctor_id = request.form['doctor_id']
+        appointment_date = request.form['appointment_date']
+        purpose = request.form['purpose']
+        notes = request.form['notes']
+
+        create_appointment(patient_id, doctor_id, appointment_date, purpose, notes)
+        
+        return redirect(url_for('patientappointments'))
+    
 @app.route('/add_doctor_prescription', methods=['POST'])
 def add_doctor_prescriptions():
     if request.method == 'POST':
@@ -204,6 +312,116 @@ def add_doctor_prescriptions():
         create_prescription(appointment_id, medication, dosage, duration, notes)
 
         return redirect(url_for('doctorprescriptions'))
+    
+@app.route('/add_patient_prescription', methods=['POST'])
+def add_patient_prescription():
+    if request.method == 'POST':
+        appointment_id = request.form['appointment_id']
+        medication = request.form['medication']
+        dosage = request.form['dosage']
+        duration = request.form['duration']
+        notes = request.form['notes']
+
+        create_prescription(appointment_id, medication, dosage, duration, notes)
+        
+        return redirect(url_for('patientprescriptions'))
+
+"""
+def is_valid_patient(patient_id):
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='root',
+            database='MedicalData'
+        )
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM Patients WHERE PatientID = %s", (patient_id,))
+        count = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        return count > 0
+    except mysql.connector.Error as e:
+        print(f"Error: {e}")
+        return False
+
+def is_valid_doctor(doctor_id):
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='root',
+            database='MedicalData'
+        )
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM Doctors WHERE DoctorID = %s", (doctor_id,))
+        count = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        return count > 0
+    except mysql.connector.Error as e:
+        print(f"Error: {e}")
+        return False
+"""
+
+@app.route('/uploadfile', methods = ['POST'])
+def uploadfile():
+    file = request.files['file']
+    
+    if file and allowed_file(file.filename):
+        ##Get Patient Id Here
+        userid = CURRENT_USERID
+        docname = secure_filename(file.filename)
+        doctype = "Medical Document"
+        current_day = datetime.date
+        uploaddate = (current_day.today())
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('INSERT INTO MedicalDocuments (PatientID, DocName, DocType, UploadDate) VALUES (%s,%s,%s,%s)',
+                       (userid, docname, doctype, uploaddate))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        file.save(os.path.join(UPLOAD_FOLDER,docname))
+        return redirect('/')
+    else:
+        return redirect('/patientmedicaldocs')
+
+@app.route('/list_docs', methods = ['POST'])  
+def list_docs():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM MedicalDocuments')
+    docs = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('doctorMedicalDocs.html', meddocs = docs)
+    
+# @app.route('/fileupload', methods = ['GET', 'POST'])
+# def uploadfile():   
+#     if request.method == 'POST':
+#         if 'file' not in request.files:
+#             flash('No file part')
+#             return redirect(request.url)
+#     file = request.files['file']
+#     if file.filename == '':
+#         flash("No file selected")
+#         return redirect(request.url)
+#     if file and allowed_file(file.filename):
+#         filename = secure_filename(file.filename)
+#         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#         return redirect(url_for('download_file'), name = filename)
+#     return render_template('patientmedicaldocs.html')
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
 if __name__ == '__main__':
     app.run(debug=True)
