@@ -31,14 +31,15 @@
         </tr>
         {% for prescription in prescriptions %}
         <tr>
-            <td>{{ prescription.PrescriptionID }}</td>
-            <td>{{ prescription.AppointmentID }}</td>
-            <td>{{ prescription.Medication }}</td>
-            <td>{{ prescription.Dosage }}</td>
-            <td>{{ prescription.Duration }}</td>
-            <td>{{ prescription.Notes }}</td>
+            <td>{{ prescription[0] }}</td>
+            <td>{{ prescription[1] }}</td>
+            <td>{{ prescription[2] }}</td>
+            <td>{{ prescription[3] }}</td>
+            <td>{{ prescription[4] }}</td>
+            <td>{{ prescription[5] }}</td>
         </tr>
         {% endfor %}
     </table>
+    <br><p><a href="/patientprofile">Back to Patient Profile</a></p>
 </body>
 </html>
