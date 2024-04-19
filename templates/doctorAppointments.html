@@ -31,15 +31,16 @@
         </tr>
         {% for appointment in appointments %}
         <tr>
-            <td>{{ appointment.AppointmentID }}</td>
-            <td>{{ appointment.PatientID }}</td>
-            <td>{{ appointment.DoctorID }}</td>
-            <td>{{ appointment.AppointmentDate }}</td>
-            <td>{{ appointment.Purpose }}</td>
-            <td>{{ appointment.Notes }}</td>
+            <td>{{ appointment[0] }}</td>
+            <td>{{ appointment[1] }}</td>
+            <td>{{ appointment[2] }}</td>
+            <td>{{ appointment[3] }}</td>
+            <td>{{ appointment[4] }}</td>
+            <td>{{ appointment[5] }}</td>
         </tr>
         {% endfor %}
     </table>
+    <p><a href="/doctorhome">Back to Doctor Home</a></p>
 </body>
 </html>
 

@@ -46,7 +46,7 @@ def register():
             return redirect(url_for('register'))
         
         # Hash the password for security
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         
         # Insert the new user into the Users table
         cursor.execute("INSERT INTO Users (Username, Password, Role, ContactInfo) VALUES (%s, %s, %s, %s)",
@@ -222,6 +222,7 @@ def patientappointments():
     appointments = read_appointments()
     return render_template('patientAppointments.html', appointments=appointments)
 
+
 @app.route('/billing')
 def billing():
     return render_template('billing.html')
@@ -286,6 +287,19 @@ def add_doctor_appointment():
         
         return redirect(url_for('doctorappointments'))
     
+@app.route('/add_patient_appointment', methods=['POST'])
+def add_patient_appointment():
+    if request.method == 'POST':
+        patient_id = request.form['patient_id']
+        doctor_id = request.form['doctor_id']
+        appointment_date = request.form['appointment_date']
+        purpose = request.form['purpose']
+        notes = request.form['notes']
+
+        create_appointment(patient_id, doctor_id, appointment_date, purpose, notes)
+        
+        return redirect(url_for('patientappointments'))
+    
 @app.route('/add_doctor_prescription', methods=['POST'])
 def add_doctor_prescriptions():
     if request.method == 'POST':
@@ -298,6 +312,116 @@ def add_doctor_prescriptions():
         create_prescription(appointment_id, medication, dosage, duration, notes)
 
         return redirect(url_for('doctorprescriptions'))
+    
+@app.route('/add_patient_prescription', methods=['POST'])
+def add_patient_prescription():
+    if request.method == 'POST':
+        appointment_id = request.form['appointment_id']
+        medication = request.form['medication']
+        dosage = request.form['dosage']
+        duration = request.form['duration']
+        notes = request.form['notes']
+
+        create_prescription(appointment_id, medication, dosage, duration, notes)
+        
+        return redirect(url_for('patientprescriptions'))
+
+"""
+def is_valid_patient(patient_id):
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='root',
+            database='MedicalData'
+        )
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM Patients WHERE PatientID = %s", (patient_id,))
+        count = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        return count > 0
+    except mysql.connector.Error as e:
+        print(f"Error: {e}")
+        return False
+
+def is_valid_doctor(doctor_id):
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='root',
+            database='MedicalData'
+        )
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM Doctors WHERE DoctorID = %s", (doctor_id,))
+        count = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        return count > 0
+    except mysql.connector.Error as e:
+        print(f"Error: {e}")
+        return False
+"""
+
+@app.route('/uploadfile', methods = ['POST'])
+def uploadfile():
+    file = request.files['file']
+    
+    if file and allowed_file(file.filename):
+        ##Get Patient Id Here
+        userid = CURRENT_USERID
+        docname = secure_filename(file.filename)
+        doctype = "Medical Document"
+        current_day = datetime.date
+        uploaddate = (current_day.today())
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('INSERT INTO MedicalDocuments (PatientID, DocName, DocType, UploadDate) VALUES (%s,%s,%s,%s)',
+                       (userid, docname, doctype, uploaddate))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        file.save(os.path.join(UPLOAD_FOLDER,docname))
+        return redirect('/')
+    else:
+        return redirect('/patientmedicaldocs')
+
+@app.route('/list_docs', methods = ['POST'])  
+def list_docs():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM MedicalDocuments')
+    docs = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('doctorMedicalDocs.html', meddocs = docs)
+    
+# @app.route('/fileupload', methods = ['GET', 'POST'])
+# def uploadfile():   
+#     if request.method == 'POST':
+#         if 'file' not in request.files:
+#             flash('No file part')
+#             return redirect(request.url)
+#     file = request.files['file']
+#     if file.filename == '':
+#         flash("No file selected")
+#         return redirect(request.url)
+#     if file and allowed_file(file.filename):
+#         filename = secure_filename(file.filename)
+#         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#         return redirect(url_for('download_file'), name = filename)
+#     return render_template('patientmedicaldocs.html')
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/uploadfile', methods = ['POST'])
 def uploadfile():
