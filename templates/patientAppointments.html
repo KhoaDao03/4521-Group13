@@ -2,23 +2,7 @@
 <html>
 <head>
     <title>Patient Appointments</title>
-</head>
-<body>
-    <h1>Add Patient Appointment</h1>
-    <form action="/add_patient_appointment" method="post">
-        <label for="patient_id">Patient ID:</label>
-        <input type="number" id="patient_id" name="patient_id" required><br><br>
-        <label for="doctor_id">Doctor ID:</label>
-        <input type="number" id="doctor_id" name="doctor_id" required><br><br>
-        <label for="appointment_date">Appointment Date:</label>
-        <input type="datetime-local" id="appointment_date" name="appointment_date" required><br><br>
-        <label for="purpose">Purpose:</label>
-        <input type="text" id="purpose" name="purpose" required><br><br>
-        <label for="notes">Notes:</label>
-        <textarea id="notes" name="notes"></textarea><br><br>
-        <input type="submit" value="Submit">
-    </form>
-    
+</head>   
     <h1>Patient Appointments</h1>
     <table border="1">
         <tr>
@@ -38,7 +22,7 @@
             </tr>
         {% endfor %}
     </table>
-    <br><p><a href="/patientprofile">Back to Patient Profile</a></p>
+    <br><button onclick="window.history.back();" class="back-button">Back</button>    </form>
 </body>
 </html>
 
