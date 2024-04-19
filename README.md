@@ -11,3 +11,6 @@ Each user will have a profile that can be accessed by doctors and the patients t
 How to split the workload: 
 We'll start by identifying the components (front/back end) of the web application.
 Then we'll split up the workload based on our strengths and preferences and communicate with each other regularly.
+
+
+![image](https://github.com/KhoaDao03/4521-Group13/assets/129322478/695ff1e6-b95a-471a-a3c9-178a568fc805)

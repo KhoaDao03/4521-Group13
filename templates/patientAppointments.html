@@ -13,16 +13,17 @@
             <th>Notes</th>
         </tr>
         {% for appointment in appointments %}
-        <tr>
-            <td>{{ appointment.AppointmentID }}</td>
-            <td>{{ appointment.DoctorID }}</td>
-            <td>{{ appointment.AppointmentDate }}</td>
-            <td>{{ appointment.Purpose }}</td>
-            <td>{{ appointment.Notes }}</td>
-        </tr>
+            <tr>
+                <td>{{ appointment[0] }}</td>
+                <td>{{ appointment[2] }}</td>
+                <td>{{ appointment[3] }}</td>
+                <td>{{ appointment[4] }}</td>
+                <td>{{ appointment[5] }}</td>
+            </tr>
         {% endfor %}
     </table>
     <br><button onclick="window.history.back();" class="back-button">Back</button>    </form>
 </body>
 </html>
+
 
