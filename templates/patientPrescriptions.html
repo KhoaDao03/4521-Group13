@@ -3,22 +3,7 @@
 <head>
     <title>Patient Prescriptions</title>
 </head>
-<body>
-    <h1>Add Patient Prescription</h1>
-    <form action="/add_patient_prescription" method="post">
-        <label for="appointment_id">Appointment ID:</label>
-        <input type="number" id="appointment_id" name="appointment_id" required><br><br>
-        <label for="medication">Medication:</label>
-        <input type="text" id="medication" name="medication" required><br><br>
-        <label for="dosage">Dosage:</label>
-        <input type="text" id="dosage" name="dosage" required><br><br>
-        <label for="duration">Duration:</label>
-        <input type="text" id="duration" name="duration" required><br><br>
-        <label for="notes">Notes:</label>
-        <textarea id="notes" name="notes"></textarea><br><br>
-        <input type="submit" value="Submit">
-        <button onclick="window.history.back();" class="back-button">Back</button>    </form>
-    
+<body>   
     <h1>Patient Prescriptions</h1>
     <table border="1">
         <tr>
@@ -40,5 +25,6 @@
         </tr>
         {% endfor %}
     </table>
+    <br><button onclick="window.history.back();" class="back-button">Back</button>    </form>
 </body>
 </html>
