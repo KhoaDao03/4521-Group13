@@ -420,41 +420,40 @@ def list_docs():
 #     return render_template('patientmedicaldocs.html')
 
 def allowed_file(filename):
-    return '.' in filename and \
-        filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/uploadfile', methods = ['POST'])
-def uploadfile():
-    file = request.files['file']
+# @app.route('/uploadfile', methods = ['POST'])
+# def uploadfile():
+#     file = request.files['file']
     
-    if file and allowed_file(file.filename):
-        ##Get Patient Id Here
-        userid = CURRENT_USERID
-        docname = secure_filename(file.filename)
-        doctype = "Medical Document"
-        current_day = datetime.date
-        uploaddate = (current_day.today())
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute('INSERT INTO MedicalDocuments (PatientID, DocName, DocType, UploadDate) VALUES (%s,%s,%s,%s)',
-                       (userid, docname, doctype, uploaddate))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        file.save(os.path.join(UPLOAD_FOLDER,docname))
-        return redirect('/')
-    else:
-        return redirect('/patientmedicaldocs')
+#     if file and allowed_file(file.filename):
+#         ##Get Patient Id Here
+#         userid = CURRENT_USERID
+#         docname = secure_filename(file.filename)
+#         doctype = "Medical Document"
+#         current_day = datetime.date
+#         uploaddate = (current_day.today())
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute('INSERT INTO MedicalDocuments (PatientID, DocName, DocType, UploadDate) VALUES (%s,%s,%s,%s)',
+#                        (userid, docname, doctype, uploaddate))
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
+#         file.save(os.path.join(UPLOAD_FOLDER,docname))
+#         return redirect('/')
+#     else:
+#         return redirect('/patientmedicaldocs')
 
-@app.route('/list_docs', methods = ['POST'])  
-def list_docs():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM MedicalDocuments')
-    docs = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return render_template('doctorMedicalDocs.html', meddocs = docs)
+# @app.route('/list_docs', methods = ['POST'])  
+# def list_docs():
+#     conn = get_db_connection()
+#     cursor = conn.cursor(dictionary=True)
+#     cursor.execute('SELECT * FROM MedicalDocuments')
+#     docs = cursor.fetchall()
+#     cursor.close()
+#     conn.close()
+#     return render_template('doctorMedicalDocs.html', meddocs = docs)
     
 # @app.route('/fileupload', methods = ['GET', 'POST'])
 # def uploadfile():   
