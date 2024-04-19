@@ -389,7 +389,7 @@ def uploadfile():
         cursor.close()
         conn.close()
         file.save(os.path.join(UPLOAD_FOLDER,docname))
-        return redirect('/')
+        return redirect('/patientmedicaldocs')
     else:
         return redirect('/patientmedicaldocs')
 
