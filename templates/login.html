@@ -5,20 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="../static/login_register.css">
-
 </head>
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <form id="login-form" action="{{url_for('login')}}" method="post">
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form id="login-form" action="{{ url_for('login') }}" method="post">
             <input type="text" name="username" placeholder="Username" required><br>
             <input type="password" name="password" placeholder="Password" required><br>
             <input type="submit" value="Sign in">
         </form>
         <a href="{{ url_for('register') }}" class="signup-link">Sign up</a>
+        <!--
         <br><p><a href="/doctorhome">Go to Doctor Home</a></p>
         <p><a href="/patienthome">Go to Patient Home</a></p>
-
+        -->
     </div>
 </body>
 </html>

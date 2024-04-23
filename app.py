@@ -75,10 +75,14 @@ def login():
 
         if user and check_password_hash(user['Password'], password):
             session['user_id'] = user['UserID']  # Store user ID in session
+            session['user_role'] = user['Role']  # Store user role in session
+            
             if user['Role'] == 'doctor':
                 return redirect(url_for('doctor_home'))
             elif user['Role'] == 'patient':
                 return redirect(url_for('patienthome'))
+            elif user['Role'] == 'administrator':
+                return redirect(url_for('admin_home'))  # Redirect admin to admin dashboard
             else:
                 flash('Login successful. No designated dashboard.', 'success')
                 return redirect(url_for('login'))  # Redirect to a default page or error page
@@ -100,6 +104,11 @@ def doctor_home():
 
 @app.route('/adddoctor', methods=('GET', 'POST'))
 def add_doctor():
+    # Check if the logged-in user is an admin
+    if 'user_id' not in session or session.get('user_role') != 'administrator':
+        flash('Unauthorized access.', 'error')
+        return redirect(url_for('display_login'))
+    
     if request.method == 'POST':
         username = request.form['username']
         fullname = request.form['fullname']
@@ -115,6 +124,7 @@ def add_doctor():
         if user is None:
             cursor.close()
             conn.close()
+            flash('No such doctor found. Please register the doctor first.', 'error')
             return redirect(url_for('register'))
 
         # Insert new doctor profile using the UserID from Users table
@@ -124,6 +134,7 @@ def add_doctor():
         conn.commit()
         cursor.close()
         conn.close()
+        flash('Doctor added successfully.', 'success')
         return redirect(url_for('doctor_home'))
     
     return render_template('addDoctor.html')
@@ -140,7 +151,7 @@ def edit_doctor(id):
         cursor.execute('UPDATE DoctorProfiles SET FullName = %s, Specialty = %s, ContactInfo = %s WHERE DoctorID = %s',
                        (fullname, specialty, contact_info, id))
         conn.commit()
-        return redirect(url_for('doctor_home'))
+        return redirect(url_for('admin_home'))
 
     cursor.execute('SELECT * FROM DoctorProfiles WHERE DoctorID = %s', (id,))
     doctor = cursor.fetchone()
@@ -154,7 +165,7 @@ def delete_doctor(id):
     conn.commit()
     cursor.close()
     conn.close()
-    return redirect(url_for('doctor_home'))
+    return redirect(url_for('admin_home'))
 
 @app.route('/listdoctors')
 def list_doctors():
@@ -397,7 +408,16 @@ def list_docs():
     cursor.close()
     conn.close()
     return render_template('doctorMedicalDocs.html', meddocs = docs)
-    
+
+@app.route('/adminhome')
+def admin_home():
+    # Ensure only logged-in admins can access this page
+    if 'user_role' in session and session['user_role'] == 'administrator':
+        return render_template('adminHome.html')
+    else:
+        flash('Unauthorized access. Please log in as an administrator.', 'error')
+        return redirect(url_for('display_login'))
+
 # @app.route('/fileupload', methods = ['GET', 'POST'])
 # def uploadfile():   
 #     if request.method == 'POST':
