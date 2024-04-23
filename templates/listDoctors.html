@@ -19,13 +19,15 @@
 
     <table>
         <tr>
-            <th>Full Name</th>
+	    <th>ID</th>
+	    <th>Full Name</th>
             <th>Specialty</th>
             <th>Contact Info</th>
             <th>Actions</th>
         </tr>
         {% for doctor in doctors %}
         <tr>
+	    <td>{{ doctor.DoctorID }}</td>
             <td>{{ doctor.FullName }}</td>
             <td>{{ doctor.Specialty }}</td>
             <td>{{ doctor.ContactInfo }}</td>

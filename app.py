@@ -126,7 +126,15 @@ def add_doctor():
             conn.close()
             flash('No such doctor found. Please register the doctor first.', 'error')
             return redirect(url_for('register'))
-
+        # Check if this user already has a doctor profile
+        cursor.execute("SELECT * FROM DoctorProfiles WHERE DoctorID = %s", (user[0],))
+        existing_doctor = cursor.fetchone()
+        
+        if existing_doctor:
+            cursor.close()
+            conn.close()
+            flash('A doctor profile already exists for this username.', 'error')
+            return redirect(url_for('list_doctors'))
         # Insert new doctor profile using the UserID from Users table
         user_id = user[0]
         cursor.execute('INSERT INTO DoctorProfiles (DoctorID, FullName, Specialty, ContactInfo) VALUES (%s, %s, %s, %s)',

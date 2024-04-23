@@ -8,8 +8,7 @@
     <form action="/add_doctor_appointment" method="post">
         <label for="patient_id">Patient ID:</label>
         <input type="number" id="patient_id" name="patient_id" required><br><br>
-        <label for="doctor_id">Doctor ID:</label>
-        <input type="number" id="doctor_id" name="doctor_id" required><br><br>
+        <input type="hidden" id="doctor_id" name="doctor_id" value="{{ session['user_id'] }}"><!-- Hidden doctor ID -->
         <label for="appointment_date">Appointment Date:</label>
         <input type="datetime-local" id="appointment_date" name="appointment_date" required><br><br>
         <label for="purpose">Purpose:</label>
@@ -32,12 +31,12 @@
         </tr>
         {% for appointment in appointments %}
         <tr>
-            <td>{{ appointment[0] }}</td>
-            <td>{{ appointment[1] }}</td>
-            <td>{{ appointment[2] }}</td>
-            <td>{{ appointment[3] }}</td>
-            <td>{{ appointment[4] }}</td>
-            <td>{{ appointment[5] }}</td>
+            <td>{{ appointment.appointment_id }}</td>
+            <td>{{ appointment.patient_id }}</td>
+            <td>{{ appointment.doctor_id }}</td>
+            <td>{{ appointment.appointment_date }}</td>
+            <td>{{ appointment.purpose }}</td>
+            <td>{{ appointment.notes }}</td>
         </tr>
         {% endfor %}
     </table>
