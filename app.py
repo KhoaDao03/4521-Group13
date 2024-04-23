@@ -151,7 +151,7 @@ def edit_doctor(id):
         cursor.execute('UPDATE DoctorProfiles SET FullName = %s, Specialty = %s, ContactInfo = %s WHERE DoctorID = %s',
                        (fullname, specialty, contact_info, id))
         conn.commit()
-        return redirect(url_for('doctor_home'))
+        return redirect(url_for('admin_home'))
 
     cursor.execute('SELECT * FROM DoctorProfiles WHERE DoctorID = %s', (id,))
     doctor = cursor.fetchone()
@@ -165,7 +165,7 @@ def delete_doctor(id):
     conn.commit()
     cursor.close()
     conn.close()
-    return redirect(url_for('doctor_home'))
+    return redirect(url_for('admin_home'))
 
 @app.route('/listdoctors')
 def list_doctors():
