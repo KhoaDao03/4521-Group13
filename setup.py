@@ -1,4 +1,5 @@
 import mysql.connector
+from werkzeug.security import generate_password_hash
 
 def create_tables():
     try:
@@ -142,6 +143,21 @@ def create_tables():
                       )''')
     print('InsuranceInformation table created')
 
+
+    # Check for an existing admin account
+    cursor.execute("SELECT * FROM Users WHERE Username='admin'")
+    result = cursor.fetchone()
+    if not result:
+        # No admin user found, let's create one
+        hashed_password = generate_password_hash('adminpassword')
+        cursor.execute(
+            "INSERT INTO Users (Username, Password, Role) VALUES (%s, %s, %s)",
+            ('admin', hashed_password, 'administrator')
+        )
+        print('Admin account created')
+    else:
+        print('Admin account already exists')
+    
     conn.commit()
     cursor.close()
     conn.close()

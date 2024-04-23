@@ -1,0 +1,29 @@
+.admin-container {
+    width: 90%;
+    margin: auto;
+    padding: 20px;
+}
+
+.admin-container h1 {
+    text-align: center;
+}
+
+.admin-container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.admin-container ul li {
+    margin-top: 10px;
+}
+
+.admin-container ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    display: inline-block;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f8f8f8;
+}
