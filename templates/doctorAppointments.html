@@ -30,14 +30,16 @@
             <th>Notes</th>
         </tr>
         {% for appointment in appointments %}
+	{% if appointment[2] == session['user_id'] %} <!-- I know this should be done serverside -->
         <tr>
-            <td>{{ appointment.appointment_id }}</td>
-            <td>{{ appointment.patient_id }}</td>
-            <td>{{ appointment.doctor_id }}</td>
-            <td>{{ appointment.appointment_date }}</td>
-            <td>{{ appointment.purpose }}</td>
-            <td>{{ appointment.notes }}</td>
+            <td>{{ appointment[0] }}</td>
+            <td>{{ appointment[1] }}</td>
+            <td>{{ appointment[2] }}</td>
+            <td>{{ appointment[3] }}</td>
+            <td>{{ appointment[4] }}</td>
+            <td>{{ appointment[5] }}</td>
         </tr>
+	{% endif %}
         {% endfor %}
     </table>
 </body>
