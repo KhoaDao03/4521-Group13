@@ -75,8 +75,8 @@ which allow the doctors to access to doctor's dashboard with patient's functiona
 
 
 ## Work Separation
-James Hugglestone: Responsible for doctors page (CRUD), login and register page, ensure user data protection(secure programming) 
-Trent Guillen: Responsilbe for appointments, prescription pages (CRUD), distribution plan (distributed programming)
-Nathan Wallen: Responsible for file management functionality of the website (CRUD), web application structure
-Khoa Dao: Responsible for doctors page (CRUD operations), distribution plan (distributed programming)
-Chris Canty: Responsible for web application structure, distribution plan (distributed programming)
+- James Hugglestone: Responsible for doctors page (CRUD), login and register page, ensure user data protection(secure programming) 
+- Trent Guillen: Responsilbe for appointments, prescription pages (CRUD), distribution plan (distributed programming)
+- Nathan Wallen: Responsible for file management functionality of the website (CRUD), web application structure
+- Khoa Dao: Responsible for doctors page (CRUD operations), distribution plan (distributed programming)
+- Chris Canty: Responsible for web application structure, distribution plan (distributed programming)
