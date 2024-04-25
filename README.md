@@ -8,7 +8,9 @@ The Healthcare Information Management System is a web application designed to ma
 To login as an admin:
 username: admin
 password: adminpassword
-which allows the users to have admin privileges by granting access admin portal
+which allows the users to have admin privileges by granting access admin portal.
+The admin role is needed to add doctors to the doctor database after the doctor has created their account.
+The admin needs to create a profile for the doctor that is linked with the userID of the doctor before they can access things in the doctor portal.
 
 
 ## Website application overview structure
