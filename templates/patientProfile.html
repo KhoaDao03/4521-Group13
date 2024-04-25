@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Patient Profiles</title>
-        <style>
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            th, td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-            th {
-                background-color: #f2f2f2;
-            }
-        </style>
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Profile</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-        <h2>Patient Profiles</h2>
+    <h2>Patient Profile</h2>
+
+    {% if profile %}
+        <!-- Display the patient's existing profile -->
         <table>
             <thead>
                 <tr>
@@ -31,43 +37,37 @@
                 </tr>
             </thead>
             <tbody>
-                {% for profile in patient_profiles %}
                 <tr>
                     <td>{{ profile['FullName'] }}</td>
-                    <td>{{ profile['DOB'] }}</td>
+                    <td>{{ profile['DOB'] | date('Y-m-d') }}</td>
                     <td>{{ profile['Gender'] }}</td>
                     <td>{{ profile['Address'] }}</td>
                     <td>
-                        <form action="/delete/{{ profile['PatientID'] }}" method="post">
-                            <button type="submit" style="color: red;">Delete</button>
+                        <form action="/deleteProfile" method="post">
+                            <button type="submit" style="color: red;">Delete Profile</button>
                         </form>
                     </td>
                 </tr>
-                {% endfor %}
             </tbody>
         </table>
-    
-    <h3>Add New Patient</h3>
-    <!-- Form for adding a new patient -->
-    <form action="/addPatient" method="POST">
-        Full Name: <input type="text" name="FullName" required><br>
-        Date of Birth: <input type="date" name="DOB" required><br>
-        Gender: <input type="text" name="Gender"><br>
-        Address: <textarea name="Address"></textarea><br>
-        Medical History ID: <input type="number" name="MedicalHistoryID"><br>
-        <input type="submit" value="Add Patient">
-    </form>
+    {% else %}
+        <div class="form-section">
+            <h3>Create Patient Profile</h3>
+            <!-- Form for creating a new patient profile -->
+            <form action="/addPatient" method="POST">
+                Full Name: <input type="text" name="FullName" required><br>
+                Date of Birth: <input type="date" name="DOB" required><br>
+                Gender: <input type="text" name="Gender"><br>
+                Address: <textarea name="Address"></textarea><br>
+                <input type="submit" value="Create Profile">
+            </form>
+        </div>
+    {% endif %}
 
+    <p><a href="/patientmedicaldocs">Patient Medical Docs</a></p>
+    <p><a href="/patientprescriptions">Patient Prescriptions</a></p>
+    <p><a href="/patientappointments">Patient Appointments</a></p>
 
-
-<!-- <h1>Patient Profile</h1> -->
-
-<p><a href="/patientmedicaldocs">Patient Medical Docs</a></p>
-<p><a href="/patientprescriptions">Patient Prescriptions</a></p>
-<p><a href="/patientappointments">Patient Appointments</a></p>
-
-
-
-<br><p><a href="/patienthome">Back to Patient Home</a></p>
+    <br><p><a href="/patienthome">Back to Patient Home</a></p>
 </body>
 </html>
