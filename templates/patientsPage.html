@@ -1,4 +1,40 @@
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
 <h1>Patients Page</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Date of Birth</th>
+            <th>Gender</th>
+            <th>Address</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for profile in patient_profiles %}
+        <tr>
+            <td>{{ profile['FullName'] }}</td>
+            <td>{{ profile['DOB'] }}</td>
+            <td>{{ profile['Gender'] }}</td>
+            <td>{{ profile['Address'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <p><a href="/patientprescriptions">Prescriptions</a></p>
 <p><a href="/patientmedicaldocs">Medical Documents</a></p>

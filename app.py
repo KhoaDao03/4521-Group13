@@ -191,7 +191,13 @@ def list_doctors():
 
 @app.route('/patientspage')
 def patientspage():
-    return render_template('patientsPage.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM PatientProfiles")
+    profiles = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('patientsPage.html', patient_profiles=profiles)
 
 @app.route('/doctorprescriptions')
 def doctorprescriptions():
