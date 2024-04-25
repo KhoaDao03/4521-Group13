@@ -3,6 +3,7 @@ import os
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from PresAndAppo import read_appointments, read_prescriptions, create_appointment, create_prescription
+from datetime import datetime
 
 import mysql.connector
 import datetime
@@ -213,13 +214,23 @@ def patienthome():
 
 @app.route('/patientprofile')
 def patientprofile():
+    if 'user_id' not in session:
+        flash('Please log in to view this page.', 'error')
+        return redirect(url_for('login'))
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM PatientProfiles")
-    profiles = cursor.fetchall()
+    user_id = session['user_id']
+    cursor.execute("SELECT * FROM PatientProfiles WHERE MedicalHistoryID = %s", (user_id,))
+    profile = cursor.fetchone()
+    
+    if profile and profile['DOB']:
+        profile['DOB'] = profile['DOB'].strftime('%Y-%m-%d')  # Format the date here
+
     cursor.close()
     conn.close()
-    return render_template('patientProfile.html', patient_profiles=profiles)
+
+    return render_template('patientProfile.html', profile=profile)
 
 @app.route('/patientmedicaldocs')
 def patientmedicaldocs():
@@ -262,18 +273,37 @@ def doctorsearch():
 
 @app.route('/addPatient', methods=['POST'])
 def add_patient():
-    if request.method == 'POST':
+    if 'user_id' not in session:
+        flash('Please log in to create or manage a profile.', 'error')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Check if a profile already exists
+    cursor.execute("SELECT * FROM PatientProfiles WHERE MedicalHistoryID = %s", (user_id,))
+    if cursor.fetchone():
+        # If a profile exists, do not create a new one
+        flash('A profile already exists.', 'error')
+    else:
+        # No profile exists, proceed with creation
         fullname = request.form['FullName']
         dob = request.form['DOB']
         gender = request.form['Gender']
         address = request.form['Address']
-        medicalhistoryid = request.form['MedicalHistoryID']
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)   
-        cursor.execute("INSERT INTO PatientProfiles (FullName, DOB, Gender, Address, MedicalHistoryID) VALUES (%s, %s, %s, %s, %s)", (fullname, dob, gender, address, medicalhistoryid))
+        
+        cursor.execute("""
+            INSERT INTO PatientProfiles (FullName, DOB, Gender, Address, MedicalHistoryID)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (fullname, dob, gender, address, user_id))
+        
         conn.commit()
-        #Flask('Patient Profile Added Successfully')
-        return patientprofile()
+        #flash('Profile created successfully.', 'success')
+
+    cursor.close()
+    conn.close()
+    return redirect(url_for('patientprofile'))
     
 
 
@@ -340,6 +370,25 @@ def add_patient_prescription():
         
         return redirect(url_for('patientprescriptions'))
 
+@app.route('/deleteProfile', methods=['POST'])
+def delete_profile():
+    if 'user_id' not in session:
+        flash('Please log in to delete profiles.', 'error')
+        return redirect(url_for('login'))
+    
+    user_id = session['user_id']  # Assuming session['user_id'] is the ID linked to the profile
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    cursor.execute("DELETE FROM PatientProfiles WHERE MedicalHistoryID = %s", (user_id,))
+    conn.commit()
+    
+    cursor.close()
+    conn.close()
+
+    #flash('Profile deleted successfully.', 'success')
+    return redirect(url_for('patientprofile'))
+    
 """
 def is_valid_patient(patient_id):
     try:

@@ -39,7 +39,7 @@
             <tbody>
                 <tr>
                     <td>{{ profile['FullName'] }}</td>
-                    <td>{{ profile['DOB'] | date('Y-m-d') }}</td>
+                    <td>{{ profile['DOB'] }}</td>
                     <td>{{ profile['Gender'] }}</td>
                     <td>{{ profile['Address'] }}</td>
                     <td>
@@ -59,6 +59,8 @@
                 Date of Birth: <input type="date" name="DOB" required><br>
                 Gender: <input type="text" name="Gender"><br>
                 Address: <textarea name="Address"></textarea><br>
+		<input type="hidden" name="MedicalHistoryID" value="{{ session['user_id'] }}">
+
                 <input type="submit" value="Create Profile">
             </form>
         </div>
