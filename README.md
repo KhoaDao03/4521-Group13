@@ -5,6 +5,13 @@ Group members: James Hugglestone, Trent Guillen, Nathan Wallen, Khoa Dao, Chris 
 The Healthcare Information Management System is a web application designed to make handling patient healthcare information simpler and more secure. It serves three main user roles: doctors, patients, and a database manager. Each user has their own profile, which can be accessed by both doctors and the patients themselves to manage health data effectively. The system focuses on security and uses techniques like Secure Computing along with Distributed Computing for other site operations. This ensures that patient records are both safe and easy to access, meeting the crucial need for privacy and efficiency in managing healthcare information.
 
 ## Instructions for the user interface that is beyond the obvious
+This web application needs a local MySQL server running with:
+username: root
+password: root
+database: medicaldata
+If there is a local MySQL server running already/exists, go to ./.vscode/settings.json and change
+database, username, password to match with the local MySQL.
+
 These are preset users for admin, doctor, patient credentials
 
 To login as an admin:
@@ -51,7 +58,7 @@ which allow the doctors to access to doctor's dashboard with patient's functiona
 
 
 ## Libraries Used:
-- MYSQL: For database management.
+- MySQL: For database management.
 - Flask: A micro web framework for Python, used to construct and manage the web application's server-side. It handles URL routing, HTTP requests, and the rendering of HTML templates.
     + render_template: Utilized to render HTML templates.
     + flash: Used to display flash messages to the user.
