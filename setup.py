@@ -148,7 +148,7 @@ def create_tables():
     cursor.execute("SELECT * FROM Users WHERE Username='admin'")
     result = cursor.fetchone()
     if not result:
-        # No admin user found, let's create one
+        # No admin user found
         hashed_password = generate_password_hash('adminpassword')
         cursor.execute(
             "INSERT INTO Users (Username, Password, Role) VALUES (%s, %s, %s)",
@@ -157,6 +157,36 @@ def create_tables():
         print('Admin account created')
     else:
         print('Admin account already exists')
+    
+
+    # Check for an existing doctor account
+    cursor.execute("SELECT * FROM Users WHERE Username='doctor'")
+    result = cursor.fetchone()
+    if not result:
+        # No doctor user found
+        hashed_password = generate_password_hash('doctorpassword')
+        cursor.execute(
+            "INSERT INTO Users (Username, Password, Role) VALUES (%s, %s, %s)",
+            ('doctor', hashed_password, 'doctor')
+        )
+        print('Doctor account created')
+    else:
+        print('Doctor account already exists')
+
+    # Check for an existing patient account
+    cursor.execute("SELECT * FROM Users WHERE Username='patient'")
+    result = cursor.fetchone()
+    if not result:
+        # No patient user found
+        hashed_password = generate_password_hash('patientpassword')
+        cursor.execute(
+            "INSERT INTO Users (Username, Password, Role) VALUES (%s, %s, %s)",
+            ('patient', hashed_password, 'patient')
+        )
+        print('Patient account created')
+    else:
+        print('Patient account already exists')
+    
     
     conn.commit()
     cursor.close()

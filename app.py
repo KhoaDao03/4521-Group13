@@ -186,9 +186,7 @@ def list_doctors():
     conn.close()
     return render_template('listDoctors.html', doctors=doctors)
 
-# @app.route('/doctorprofile')
-# def doctorprofile():
-#     return render_template('doctorProfile.html')
+
 
 @app.route('/patientspage')
 def patientspage():
@@ -395,49 +393,6 @@ def delete_profile():
     #flash('Profile deleted successfully.', 'success')
     return redirect(url_for('patientprofile'))
     
-"""
-def is_valid_patient(patient_id):
-    try:
-        conn = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='root',
-            database='MedicalData'
-        )
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT COUNT(*) FROM Patients WHERE PatientID = %s", (patient_id,))
-        count = cursor.fetchone()[0]
-
-        cursor.close()
-        conn.close()
-
-        return count > 0
-    except mysql.connector.Error as e:
-        print(f"Error: {e}")
-        return False
-
-def is_valid_doctor(doctor_id):
-    try:
-        conn = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='root',
-            database='MedicalData'
-        )
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT COUNT(*) FROM Doctors WHERE DoctorID = %s", (doctor_id,))
-        count = cursor.fetchone()[0]
-
-        cursor.close()
-        conn.close()
-
-        return count > 0
-    except mysql.connector.Error as e:
-        print(f"Error: {e}")
-        return False
-"""
 
 @app.route('/uploadfile', methods = ['POST'])
 def uploadfile():
@@ -481,73 +436,9 @@ def admin_home():
         flash('Unauthorized access. Please log in as an administrator.', 'error')
         return redirect(url_for('display_login'))
 
-# @app.route('/fileupload', methods = ['GET', 'POST'])
-# def uploadfile():   
-#     if request.method == 'POST':
-#         if 'file' not in request.files:
-#             flash('No file part')
-#             return redirect(request.url)
-#     file = request.files['file']
-#     if file.filename == '':
-#         flash("No file selected")
-#         return redirect(request.url)
-#     if file and allowed_file(file.filename):
-#         filename = secure_filename(file.filename)
-#         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#         return redirect(url_for('download_file'), name = filename)
-#     return render_template('patientmedicaldocs.html')
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
-
-# @app.route('/uploadfile', methods = ['POST'])
-# def uploadfile():
-#     file = request.files['file']
-    
-#     if file and allowed_file(file.filename):
-#         ##Get Patient Id Here
-#         userid = CURRENT_USERID
-#         docname = secure_filename(file.filename)
-#         doctype = "Medical Document"
-#         current_day = datetime.date
-#         uploaddate = (current_day.today())
-#         conn = get_db_connection()
-#         cursor = conn.cursor(dictionary=True)
-#         cursor.execute('INSERT INTO MedicalDocuments (PatientID, DocName, DocType, UploadDate) VALUES (%s,%s,%s,%s)',
-#                        (userid, docname, doctype, uploaddate))
-#         conn.commit()
-#         cursor.close()
-#         conn.close()
-#         file.save(os.path.join(UPLOAD_FOLDER,docname))
-#         return redirect('/')
-#     else:
-#         return redirect('/patientmedicaldocs')
-
-# @app.route('/list_docs', methods = ['POST'])  
-# def list_docs():
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute('SELECT * FROM MedicalDocuments')
-#     docs = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('doctorMedicalDocs.html', meddocs = docs)
-    
-# @app.route('/fileupload', methods = ['GET', 'POST'])
-# def uploadfile():   
-#     if request.method == 'POST':
-#         if 'file' not in request.files:
-#             flash('No file part')
-#             return redirect(request.url)
-#     file = request.files['file']
-#     if file.filename == '':
-#         flash("No file selected")
-#         return redirect(request.url)
-#     if file and allowed_file(file.filename):
-#         filename = secure_filename(file.filename)
-#         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#         return redirect(url_for('download_file'), name = filename)
-#     return render_template('patientmedicaldocs.html')
 
 def allowed_file(filename):
     return '.' in filename and \
