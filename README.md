@@ -14,18 +14,18 @@ database, username, password to match with the local MySQL.
 
 These are preset users for admin, doctor, patient credentials
 
-To login as an admin:
+- To login as an admin:
 username: admin
 password: adminpassword
 which allows the users to have admin privileges by granting access admin portal
 from the admin portal, user can grant doctor privileges to other users
 
-To login as an doctor:
+- To login as an doctor:
 username: doctor
 password: doctorpassword
 which allow the doctors to access to doctor's dashboard with doctor's functionalities
 
-To login as an patient:
+- To login as an patient:
 username: patient
 password: patientpassword
 which allow the doctors to access to doctor's dashboard with patient's functionalities
